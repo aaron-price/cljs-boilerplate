@@ -9,19 +9,25 @@
 (def allowed-hosts ["localhost" "aaroncoding.com" ""])
 (def allowed-host? (includes? host allowed-hosts))
 
+
+(defn ^:dev/after-load dev-runner []
+  ; Re-run tests with every reload (:dev only)
+  (when ^boolean js/goog.DEBUG
+    (run-tests)))
+
+
 (defn ^:export init []
   (if allowed-host? 
     (do 
-      ; Run tests only in dev mode
-      (when ^boolean js/goog.DEBUG
-        (run-tests))
+      (dev-runner)
       
       ; render root component
       (r/render [hello] 
                 (js/document.getElementById "aaron")))
     
     ; Not allowed
-    (r/render [:div "Sorry, you do not have permission yet."] 
+    (r/render [:div "Sorry, this domain hasn't been whitelisted. :-("] 
               (js/document.getElementById "aaron"))))
 
 (init)
+
